@@ -16,21 +16,37 @@ var GameController = (function(){
 			x:0,
 			y:0,
 			radius:1,
+			density: 4,
+			impulse: 100,
 			color: 'grey'
 		},
-		exit: {
-			type: 'vert',
+		targets: [{
+			width: 0.5,
+			height: 0.5,
 			x: 40,
 			y: 0
-		},
+		},{
+			width: 2,
+			height: 2,
+			x: 20,
+			y: 0
+		}],
 		lifters:[{
 			x:15,
-			y:1,
+			y:10,
 			width: 10,
 			height: 2,
 			incUp: 1,
 			incDown: 20,
 			speed: 10
+		},{
+			x:30,
+			y:40,
+			width: 15,
+			height: 2,
+			incUp: 20,
+			incDown: 2,
+			speed: 5
 		}]
 	}];
 
@@ -97,14 +113,15 @@ var GameController = (function(){
 			shape: 'circle',
 			color: 'lightblue',
 			radius: ballConfig.radius,
+			density: ballConfig.density,
 			onKeyDown: function(event){
 				//console.log(event);
 				if(!event.repeat){
 					if(event.keyCode === KEYCODES_ARROWS_RIGHT){
-						this.applyImpulse(50, 90);
+						this.applyImpulse(ballConfig.impulse, 90);
 					}
 					else if(event.keyCode === KEYCODES_ARROWS_LEFT){
-						this.applyImpulse(50, 270);
+						this.applyImpulse(ballConfig.impulse, 270);
 					}
 				}
 			}
@@ -127,18 +144,17 @@ var GameController = (function(){
 		world.createEntity(ballHolder);
 	};
 
-	function createExit(exitConfig){
-		var mwidth = 2;
-		var mheight = 2;
+	function createTarget(targetConfig){
 		world.createEntity({
 			name: 'ball',
 			shape: 'square',
-			width: mwidth,
-			height: mheight,
-			x: exitConfig.x + mwidth / 2,
-			y: exitConfig.y + mheight / 2,
+			width: targetConfig.width,
+			height: targetConfig.height,
+			x: targetConfig.x + targetConfig.width / 2,
+			y: targetConfig.y + targetConfig.height / 2,
 			onImpact: function(entity){
 				if(entity.name == 'ball'){
+					needMoveToNextLevel = true;
 					//moveToNextLevel();
 				}
 			}
@@ -152,7 +168,10 @@ var GameController = (function(){
 
 		createBall(level.ball);
 
-		createExit(level.exit);
+		var targets = level.targets;
+		for(var i=0; i<targets.length; i++){
+			createTarget(targets[i]);
+		}
 
 		var lifters = level.lifters;
 		for(var i=0; i<lifters.length; i++){
