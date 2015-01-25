@@ -1,6 +1,8 @@
 var KEYCODES_ARROWS_UP = 38;
-var KEYCODES_ARROWS_DOWN = 40;
+var KEYCODES_ARROWS_LEFT = 37;
+var KEYCODES_ARROWS_RIGHT = 39;
 var KEYCODES_SPACE = 32;
+
 
 function round(value, decimals) {
     return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
@@ -18,16 +20,17 @@ var GameController = (function(){
 		},
 		exit: {
 			type: 'vert',
-			x: 23,
-			y: 15
+			x: 40,
+			y: 0
 		},
 		lifters:[{
-			x:0.5,
+			x:15,
 			y:1,
-			width: 5,
+			width: 10,
 			height: 2,
-			incUp: 4,
-			incDown: 6
+			incUp: 1,
+			incDown: 20,
+			speed: 10
 		}]
 	}];
 
@@ -64,35 +67,64 @@ var GameController = (function(){
 			$initialY: lifterConfig.y + lifterConfig.height/2,
 			$incUp: lifterConfig.incUp,
 			$incDown: lifterConfig.incDown,
-			$cur: 1,
-			color: 'green',
-			onTick: function(){
-				var pos = this.position();
-				this.position({x: pos.x, y: pos.y + this.$cur});
-
-				if(pos.y > this.$initialY + this.$incUp){
-					this.$cur *= -1;
-				}
-				else if(pos.y < this.$initialY + this.$incDown){
-					this.$cur *= -1;
-				}
-			}
+			$cur: 0.3,
+			color: 'green'
 		});
 
-		lifter.setVelocity('move', 0.5, 180)
+		var interval = lifterConfig.speed;
+
+		function moveAA(){
+			var entity = lifter;
+			var pos = entity.position();
+			entity.position({x: pos.x, y: pos.y + entity.$cur});
+
+			if(pos.y < (entity.$initialY - entity.$incUp)){
+				entity.$cur = Math.abs(entity.$cur);
+			}
+			else if(pos.y > (entity.$initialY + entity.$incDown)){
+				entity.$cur = Math.abs(entity.$cur) * -1;
+			}
+			setTimeout(moveAA, interval);
+
+		}
+		setTimeout(moveAA, interval);
+
 	};
 
 	function createBall(ballConfig){
-		world.createEntity({
+		var ballTemplate = {
 			name: 'ball',
 			shape: 'circle',
 			color: 'lightblue',
 			radius: ballConfig.radius,
-			onkeydown: function(event){
-				//var direction = 90 ? event.keyCode === KEYCODES_ARROWS_RIGHT : 270;
-				//this.applyImpulse(50, direction);
+			onKeyDown: function(event){
+				//console.log(event);
+				if(!event.repeat){
+					if(event.keyCode === KEYCODES_ARROWS_RIGHT){
+						this.applyImpulse(50, 90);
+					}
+					else if(event.keyCode === KEYCODES_ARROWS_LEFT){
+						this.applyImpulse(50, 270);
+					}
+				}
 			}
-		});
+		};
+
+
+		var ball = world.createEntity(ballTemplate);
+
+		var ballHolder = {
+			name: 'ballHolder', 
+			shape: 'square',
+			color: 'green',
+			type: 'static',
+			x: ball.position().x, 
+			y: ball.position().y + ballTemplate.radius + 0.1,
+			width: ballTemplate.radius * 2,
+			height: 0.1
+		};
+
+		world.createEntity(ballHolder);
 	};
 
 	function createExit(exitConfig){
@@ -107,7 +139,7 @@ var GameController = (function(){
 			y: exitConfig.y + mheight / 2,
 			onImpact: function(entity){
 				if(entity.name == 'ball'){
-					moveToNextLevel();
+					//moveToNextLevel();
 				}
 			}
 		});
@@ -126,8 +158,6 @@ var GameController = (function(){
 		for(var i=0; i<lifters.length; i++){
 			createLifter(lifters[i]);
 		}
-
-		world.pause();
 	};
 
 	function restartLevel(){
@@ -211,6 +241,8 @@ var GameController = (function(){
 	moveToNextLevel();
 
 	initWorldFuncs();
+
+	world.pause();
 
 	return {
 		startGame: function(){
