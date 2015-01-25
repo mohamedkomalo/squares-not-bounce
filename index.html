@@ -1,0 +1,86 @@
+`<html>
+
+<head>
+	<title></title>
+	
+	<script src="js/jquery-2.1.3.min.js"></script>
+	<script src="js/Box2dWeb-2.1.a.3.min.js"></script>
+	<script src="js/boxbox.min.js"></script>
+	
+	<link rel="stylesheet" href="bootstrap/3.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="bootstrap/3.3.1/css/bootstrap-theme.min.css">
+	<script src="bootstrap/3.3.1/js/bootstrap.min.js"></script>
+
+
+	<style>
+		body {
+		  padding-top: 5px;
+		}
+		.centered {
+		  position: fixed;
+		  top: 50%;
+		  left: 50%;
+		  transform: translate(-50%, -50%);
+		}
+		canvas{
+			box-shadow: 0 0 15px #888888;
+			background-color: white;
+		}
+		body{
+  			background: linear-gradient(white, rgb(224, 240, 245)); /* Standard syntax */
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-4">
+				<div class="panel panel-info">
+					<div class="panel-heading">
+							<span class="glyphicon glyphicon-screenshot" aria-hidden="true" ></span> Game Instructions
+					</div>
+					<div class="panel-body">
+						<ul class="list-unstyled">
+							<li>
+								- Hi Hi Hi Hi.
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="alert alert-info">
+						<div style="text-align:center;">
+							<div class="btn-group">
+								<button id="startGame" onclick="OnStartGameClicked()" class="btn btn-primary">Start Game</button>
+							</div>
+						</div>
+				</div>
+
+				<div class="alert alert-info" role="alert">
+					Created by <a href="https://github.com/mohamedkomalo">Mohamed Kamal Kamaly</a> during <a target="_blank" href="http://globalgamejam.org">Global Gamejam</a>
+				</div>
+			</div>
+
+			<div class="col-lg-8">
+
+				<canvas id="game" >
+					Browser must support html5 canvas
+				</canvas>
+			</div>
+
+		</div>
+
+	</div>
+
+
+	<script src="game.levels.js"></script>
+	<script src="game.js"></script>
+
+	<script>
+		function OnStartGameClicked(){
+			$("#startGame").attr('disabled','disabled');
+			GameController.startGame();
+		}
+	</script>
+</body>
+</html>
